@@ -12,10 +12,10 @@ library(png)
 library(rgl)
 
 
+HelperFunctionsFile = './Clusters_Extraction_functions.R'
+source(HelperFunctionsFile)
 MainDir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/npix3/'
 setwd(MainDir)
-HelperFunctionsFile = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/Clusters_Extraction_functions.R'
-source(HelperFunctionsFile)
 #########get the supervoxels coordinate file
 SVcoordinates=read.table('./SuperVoxels_npix3_SpatialInfo.txt',sep=",",header=T)
 
@@ -29,14 +29,14 @@ for(folder in filesInDir[1:length(filesInDir)]){
   inputfilename <- list.files(path = '.', pattern = '*_SupervoxelsExpression_NoCorrRemoved')[1]
   load(inputfilename)
   initMat <- Regionvoxels_reduced
-  
+
   #### get the coordinates for the region
   initCoord <- SVcoordinates[as.character(rownames(initMat)),]
-  
+
   ### get the raw VCs
   inputfilename <- list.files(path = '.', pattern = '*_VirtualCells_Raw')[1]
   load(inputfilename)
-  
+
   ### create dataframe
   print('Creating dataframe')
   clustersDF <- data.frame(
@@ -47,7 +47,7 @@ for(folder in filesInDir[1:length(filesInDir)]){
     clusterSize <- as.numeric(lapply(finalclusters,length))
   )
   names(clustersDF) <- c("clustersID","supervoxelsID","correlation","spatialCoherence","clusterSize")
-  
+
   save(clustersDF, file = paste(folder,'_VirtualCells_ALL',sep=''))
   print('data saved')
 }

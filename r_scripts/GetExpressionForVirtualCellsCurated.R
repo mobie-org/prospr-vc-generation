@@ -1,6 +1,15 @@
 ## This is for creating expression for every virtual cell out of Valentina's final curation ####
 
 ######
+# Loading it from the script directory, before the directory is set to OutputDir
+DictFile = './helper_files/OlegGenesDiccionary.txt'
+# load file
+dicc = read.table(DictFile, sep=',',header=F,row.names=1)
+# File with genes to remove
+listtoremoveFile = './helper_files/GenesToRemove.txt'
+# load file
+listtoremove = read.table(listtoremoveFile,header=F)[,1]
+
 MainDir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/npix3/'
 setwd(MainDir)
 
@@ -59,16 +68,9 @@ names(ClustDF) <- c("clustersID","supervoxelsID")
 print('reading data...')
 #load the npix3 matrix
 SVprofile=read.table(paste(MainDir, 'SuperVoxels_npix3_GeneExpression.txt', sep=''),sep=",",header=T)
-# Hard coded location for a diccionary for gene list change
-DictFile = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/OlegGenesDiccionary.txt'
-# File with genes to remove
-listtoremoveFile = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/GenesToRemove.txt'
-# load file
-listtoremove = read.table(listtoremoveFile,header=F)[,1]
 
 
 ####Rename Columns for Oleg's genes
-dicc = read.table(DictFile, sep=',',header=F,row.names=1)
 for(i in 1:ncol(SVprofile)){
   if(colnames(SVprofile)[i] %in% rownames(dicc)){
     colnames(SVprofile)[i] <- paste(colnames(SVprofile)[i],dicc[colnames(SVprofile)[i],1],sep="--")

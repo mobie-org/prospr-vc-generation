@@ -12,10 +12,12 @@
 # Rscript Region_Profiler.R npix3/ "Pygidium" "Pax6"
 
 #########initiate#######
-# Hard coded location for a diccionary for gene list change
-DictFile = '/g/arendt/EM_6dpf_segmentation/GenerationOfVirtualCells/ProSPr_VirtualCells/helper_files/OlegGenesDiccionary.txt'
+# Loading it from the script directory, before the directory is set to OutputDir
+DictFile = './helper_files/OlegGenesDiccionary.txt'
+# load file
+dicc = read.table(DictFile, sep=',',header=F,row.names=1)
 # File with genes to remove
-listtoremoveFile = '/g/arendt/EM_6dpf_segmentation/GenerationOfVirtualCells/ProSPr_VirtualCells/helper_files/GenesToRemove.txt'
+listtoremoveFile = './helper_files/GenesToRemove.txt'
 # load file
 listtoremove = read.table(listtoremoveFile,header=F)[,1]
 
@@ -77,7 +79,6 @@ if(selectBasedOnGene){
 dir.create(OutputDirName)
 setwd(OutputDirName)
 ####Rename Columns for Oleg's genes#####
-dicc = read.table(DictFile, sep=',',header=F,row.names=1)
 for(i in 1:ncol(SVprofile)){
   if(colnames(SVprofile)[i] %in% rownames(dicc)){
     colnames(SVprofile)[i] <- paste(colnames(SVprofile)[i],dicc[colnames(SVprofile)[i],1],sep="--")
@@ -184,12 +185,12 @@ cat(paste('Number of supervoxels: ', nrow(Regionvoxels_reduced),sep=''))
 #Save matrix
 save(Regionvoxels_reduced,file = paste(OutputDirName,"_SupervoxelsExpression_NoCorrRemoved",sep=""))
 cat('\nData saved, plotting and wrapping up\n')
-###############plot 
+###############plot
 
 library(ggplot2)
 
 p1 <- ggplot(CorrResDf, aes(x=MeansVec, y=SdsVec))
-p1 + 
+p1 +
   geom_point(alpha = 0.1,size = 2, aes(colour = Label)) +
   #geom_point(alpha = 0.1,size = 2) +
   scale_color_manual(values = c("black","blue")) +
@@ -202,7 +203,7 @@ p1 +
   #scale_colour_gradientn(colours = topo.colors(10)) +
   coord_cartesian(xlim = c(0, 1)) +
   #scale_y_log10() +
-  ggtitle("Neighbour Correlation Analysis") + 
+  ggtitle("Neighbour Correlation Analysis") +
   theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
   ylab("Neighbour correlation Standard Deviation") +
   xlab("Neighbour correlation Mean") +
@@ -213,7 +214,7 @@ p1 +
         legend.title = element_text(size = 14),
         legend.box = "horizontal") +
   theme(legend.key = element_blank()) +
-  theme(legend.background = element_rect(fill=alpha('grey', 0.0))) 
+  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
 
 ggsave(paste(NameOfRegion,"_SV_NeighbourCorrelationSelected.pdf",sep=""), width=10, height=6, dpi=700, useDingbats=FALSE)
 

@@ -6,8 +6,10 @@ print("Grouping the Supervoxels into cells in the cluster")
 # Rscript Clusters_Extraction_6dpf_npix3.R FileCreatedWithRegion_Profiler.R
 # Rscript Clusters_Extraction_6dpf_npix3.R RegPro...SupervoxelsExpression_NoCorrRemoved
 
-# HARD CODED location of helper functions
-HelperFunctionsFile = '/g/arendt/EM_6dpf_segmentation/GenerationOfVirtualCells/ProSPr_VirtualCells/scripts/Clusters_Extraction_functions.R'
+# helper functions is assumed to be in the scripts folder
+HelperFunctionsFile = './Clusters_Extraction_functions.R'
+#load functions
+source(HelperFunctionsFile)
 # get inputs
 args = commandArgs(trailingOnly=TRUE)
 # test if number of arguments are correct: if not, return an error
@@ -25,8 +27,6 @@ library(rgl)
 ############################################
 #########Define your directory
 setwd(dirname(ExpFile))
-#load functions
-source(HelperFunctionsFile)
 #########get a matrix
 inputfilename <- basename(ExpFile)
 load(inputfilename)
@@ -67,10 +67,10 @@ while(length(tempclusters)>0){
     #get name (split) of the cluster:
     subclustname <- paste(clustname,names(clust)[i],sep="")
     #if size fits, save it as final, else save it back in tempclusters
-    
+
     #This decision here can be a little bit more elaborate to take on account both sizes, their correlation... etc:
     #A more elaborated method is implemented:
-    
+
     #if size is bigger than maxsize, send it again to the queue
     if (length(clust[[i]])>clsize[2]){
       tempclusters[[length(tempclusters)+1]] <- clust[[i]]
@@ -80,11 +80,11 @@ while(length(tempclusters)>0){
     if (length(clust[[i]])<clsize[1]){
       finalclusters[[length(finalclusters)+1]] <- clust[[i]]
       names(finalclusters)[length(finalclusters)] <- subclustname #not + 1 because it's updated
-    }   
-    
+    }
+
     #if size is in between, check the values of correlation, spatial coherence and size
     #then subdivide it and check the same values for the subclusters
-    #if there is an improvement, save the two subclusters separately, otherwise save the initial subdivision    
+    #if there is an improvement, save the two subclusters separately, otherwise save the initial subdivision
     if (length(clust[[i]])>=clsize[1] & length(clust[[i]])<=clsize[2]){
       IniClust_Corr <- MyCorrFunc(clust[[i]],initMat)
       IniClust_SpCoh <- SpatCoheFunc(clust[[i]],initCoord)
@@ -139,8 +139,8 @@ print("Cleaning the data and processing it for curation\n")
 #create a dataframe with the final clusters:
 ##Cluster identifier: ABBAB...
 ##Supervoxels IDs: 1256,1252,...
-##Inner-cluster correlation value: 0.86    
-##Spatial coherence / bilaterality: 11   
+##Inner-cluster correlation value: 0.86
+##Spatial coherence / bilaterality: 11
 ##Cluster size: 14
 clustersDF <- data.frame(
   clusterID <- names(finalclusters),
@@ -155,10 +155,10 @@ names(clustersDF) <- c("clustersID","supervoxelsID","correlation","spatialCohere
 sizelimit <- 15
 #plot nicely
 p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
-  geom_point(size = 3, alpha = 0.8) + 
-  #scale_colour_gradientn(colours = topo.colors(5)) + 
-  scale_color_gradient(low = 'red', high = 'green') + 
-  ggtitle(paste(regionname," clusters characteristics",sep="")) + 
+  geom_point(size = 3, alpha = 0.8) +
+  #scale_colour_gradientn(colours = topo.colors(5)) +
+  scale_color_gradient(low = 'red', high = 'green') +
+  ggtitle(paste(regionname," clusters characteristics",sep="")) +
   theme(axis.title=element_text(size=14)) +
   theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
   theme(axis.title=element_text(size=14)) +
@@ -173,10 +173,10 @@ print(p)
 ggsave(paste(regionname,"_Clusters_characteristics.pdf",sep=""), width=10, height=10, dpi=700, useDingbats=FALSE)
 
 p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = clusterSize, y = spatialCoherence, color=correlation)) +
-  geom_point(size = 3, alpha = 0.5) + 
-  #scale_colour_gradientn(colours = topo.colors(5)) + 
-  scale_color_gradient(low = 'red', high = 'green') + 
-  ggtitle(paste(regionname," clusters characteristics",sep="")) +  
+  geom_point(size = 3, alpha = 0.5) +
+  #scale_colour_gradientn(colours = topo.colors(5)) +
+  scale_color_gradient(low = 'red', high = 'green') +
+  ggtitle(paste(regionname," clusters characteristics",sep="")) +
   theme(axis.title=element_text(size=14)) +
   theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
   theme(axis.title=element_text(size=14)) +
@@ -204,9 +204,9 @@ for(i in c(1:nrow(clustersAS))){
 
   #see it in 3D
   selected_cluster = clustersAS[i,"clustersID"]
-  
+
   cat(paste("Processing cluster",selected_cluster,"\n",sep = ' '))
-  
+
   #plot voxels
   cols=rep("grey92",nrow(initCoord))
   names(cols) = rownames(initCoord)
@@ -219,16 +219,16 @@ for(i in c(1:nrow(clustersAS))){
   rgl.pop(type = "bboxdeco") #remove the box
   rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 1)
   rgl.snapshot(filename="SVviewTemp.png")
-  
-  
+
+
   #Make the plot (run same parameters as above)
   p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
     #p <- ggplot(clustersAS, aes(x = correlation*(clusterSize^size_correction), y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
     #p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
-    geom_point(size = 3, alpha = 0.8) + 
-    #scale_colour_gradientn(colours = topo.colors(5)) + 
-    scale_color_gradient(low = 'red', high = 'green') + 
-    ggtitle(clustersAS[i,"clustersID"]) +  
+    geom_point(size = 3, alpha = 0.8) +
+    #scale_colour_gradientn(colours = topo.colors(5)) +
+    scale_color_gradient(low = 'red', high = 'green') +
+    ggtitle(clustersAS[i,"clustersID"]) +
     theme(axis.title=element_text(size=14)) +
     theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
     theme(axis.title=element_text(size=14)) +
@@ -239,13 +239,13 @@ for(i in c(1:nrow(clustersAS))){
     #         legend.title = element_text(size = 14),
     #         legend.box = "horizontal") +
     #   theme(legend.key = element_blank()) +
-    #   theme(legend.background = element_rect(fill=alpha('grey', 0.0))) + 
+    #   theme(legend.background = element_rect(fill=alpha('grey', 0.0))) +
     #  geom_abline(intercept = eq_int, slope = eq_sl) + #completely arbitrary shit
     #  geom_point(aes(x = clustersAS[i,"correlation"]*(clustersAS[i,"clusterSize"]^size_correction), y = clustersAS[i,"spatialCoherence"]/(clustersAS[i,"clusterSize"]^size_correction)),shape = 21, colour = "black", size = 4, stroke = 2)
     geom_point(aes(x = clustersAS[i,"correlation"], y = clustersAS[i,"spatialCoherence"]),shape = 21, colour = "black", size = 4, stroke = 2)
   #print(p)
   ggsave("DotViewTemp.png",width=5, height = 5, dpi=150)
-  
+
   # create a subplot and save the two images
   SVview = readPNG(source = "SVviewTemp.png")
   DotView = readPNG(source = "DotViewTemp.png")
@@ -260,16 +260,16 @@ for(i in c(1:nrow(clustersAS))){
   rasterImage(SVview,0,0,1,1)
   plot(NA,xlim=0:1,ylim=0:1,xaxt="n",yaxt="n",bty="n")
   rasterImage(DotView,0,0,1,1)
-  
+
   # write to PDF
   dev.print(png, paste(regionname,"_Clusters_",clustersAS[i,"clustersID"],".png",sep=""), width=2000,height=1000)
   dev.off()
-  
+
   # delete temporary images
   file.remove("SVviewTemp.png")
   file.remove("DotViewTemp.png")
-  
-  
+
+
 }
 
 
@@ -287,4 +287,3 @@ lapply(txtout, write, "000SortedCells.txt", append=TRUE, ncolumns=2000)
 
 #######
 cat("Clusters Extraction Done\n")
-
