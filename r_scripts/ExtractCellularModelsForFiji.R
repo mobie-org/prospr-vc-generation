@@ -20,10 +20,6 @@ x <- load("VirtualCells_ALL_Properties") #***
 Clust_DF <- get(x)
 rm(x)
 
-#load clusters profile:
-x <- load("VirtualCells_ALL_ExpressionProfile") #***
-Clust_Prof <- get(x)
-rm(x)
 
 #load 3D coordinates:
 coord3d=read.table(paste(MainDir, 'SuperVoxels_npix3_SpatialInfo.txt', sep=''),sep=",",header=T)
@@ -45,8 +41,8 @@ getListOfSV <- function(cellnames,cellGroups,cellsSVs){
     colors.names <- c("red")
   }
   SVL <- vector("list", length(colors.names))
-  names(SVL) <- colors.names  
-  
+  names(SVL) <- colors.names
+
   if(!is.null(cellGroups)){
     for (CellName in cellnames){
       col <- cellGroups[CellName,1]
@@ -66,7 +62,7 @@ Clust_DF$SVcoords = NA
 for (i in 1:nrow(Clust_DF)){
   CellModel = Clust_DF[i,]
   SVtest = getListOfSV(CellModel$clustersID,cellGroups = NULL,Clust_DF)$red
-  
+
   coordsList <- vector("list", length(SVtest))
   coordsList <- setNames(coordsList, SVtest)
   for (SV in SVtest){
@@ -81,6 +77,3 @@ for (i in 1:nrow(Clust_DF)){
 NewDF <- Clust_DF[c("clustersID", "SVcoords")]
 
 write.table(NewDF, file='CellModels_ALL_coordinates.tsv', quote=FALSE, sep='\t', col.names = F, row.names = F)
-
-#save separately the table with the expression info
-write.table(Clust_Prof, file='CellModels_ALL_profile.tsv', quote=FALSE, sep='\t')
