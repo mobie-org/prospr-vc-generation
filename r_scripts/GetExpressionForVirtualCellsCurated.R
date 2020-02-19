@@ -6,7 +6,7 @@ setwd(MainDir)
 
 ## Get the list from Valentyna and transform it into a dataframe:
 # ClustDF, with columns clustersID and supervoxelsID
-CuratedFile = 'CellModels_ALL_coordinates_vc_curated.tsv'
+CuratedFile = 'CellModels_ALL_coordinates_clust_curated.tsv'
 curated_vcs = read.table(file=CuratedFile, sep='\t')
 #load 3D coordinates:
 coord3d=read.table(paste(MainDir, 'SuperVoxels_npix3_SpatialInfo.txt', sep=''),sep=",",header=T)
@@ -78,6 +78,7 @@ for(i in 1:ncol(SVprofile)){
 
 ####Rename genes if they were wrong:
 colnames(SVprofile)[which(colnames(SVprofile) == 'Hox5')] <- 'Hox4'
+colnames(SVprofile)[which(colnames(SVprofile) == 'irx')] <- 'irx6'
 
 
 #############
@@ -104,5 +105,5 @@ AllClust = AllClust[,colSums(AllClust)>0]
 AllClust = AllClust[rowSums(AllClust)>0,]
 
 #Save
-write.table(AllClust, file='CellModels_ALL_profile_vc_curated.tsv', quote=FALSE, sep='\t')
+write.table(AllClust, file='CellModels_ALL_profile_clust_curated.tsv', quote=FALSE, sep='\t')
 print('done')
