@@ -1,9 +1,9 @@
 # variables read from command line.
 
 # ProSPr_6dpf_SuperVoxelPixCount.R
-# Curated_MEDs directory 
+# Curated_MEDs directory
 # TrackEM segmentation directory
-# number of pixels to use for the supervoxels 
+# number of pixels to use for the supervoxels
 # and output directory
 
 # Usage example
@@ -12,30 +12,21 @@
 
 ####### Check the variables#####
 
-# # directory of binarized signal probability maps
-# bspmdir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/4Curated_MEDs_Good/'
-
-# # directory of trackem regions of the animal
-# trackemdir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/TrackEM/'
 # #use the dapi shell to generate the voxel space and to restrict the number of voxels in the calculations
 # #the interior of the animal is 255 and the outside is 0.
 # this is hardcoded for now
-dapishell = '/g/arendt/PrImR/ProSPr6/DapiShell/DapiShellInv.tif'
-
-# ## PUT HERE THE SIZE OF THE SIDE OF SUPERVOXEL IN PIXELS 
-# npix = 3; #make sure is odd
-
-# #Output folder
-# outputFolder = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/'
+library(tiff)
+dapishell = 'helper_files/DapiShellInv.tif'
+ds = readTIFF(dapishell,all=T,as.is=F)
 
 # get inputs
 args = commandArgs(trailingOnly=TRUE)
 # test if number of arguments are correct: if not, return an error
 if (length(args)<4) {
-  stop("Script not called correctly. 
-       Please provide Curated_MEDs directory, 
-       TrackEM segmentation directory, 
-       number of pixels to use for the supervoxels, 
+  stop("Script not called correctly.
+       Please provide Curated_MEDs directory,
+       TrackEM segmentation directory,
+       number of pixels to use for the supervoxels,
        and output directory\n", call.=FALSE)
 }
 bspmdir = args[1]
@@ -48,9 +39,6 @@ setwd(outputFolder)
 dir.create(paste(outputFolder,'/npix',npix,sep = ''))
 
 ############# Generate Voxel Space ######
-library(tiff)
-
-ds = readTIFF(dapishell,all=T,as.is=F)
 
 zs = length(ds)
 xs = ncol(ds[1][[1]])
@@ -95,7 +83,7 @@ for(j in 1:totnsupvox){
   ycent = svmatrix[j,1]
   xcent = svmatrix[j,2]
   zcent = svmatrix[j,3]
-  
+
   zstart = zcent-floor(npix/2)
   zstop = zcent+floor(npix/2)
   ystart = ycent-floor(npix/2)
@@ -105,7 +93,7 @@ for(j in 1:totnsupvox){
   if(zstop>zs){zstop=zs}
   if(ystop>ys){ystop=ys}
   if(xstop>xs){xstop=xs}
-  
+
   tosum = 0
   for(i in zstart:zstop){
     tosum = tosum + sum(ds[i][[1]][ystart:ystop,xstart:xstop])
@@ -127,7 +115,7 @@ getNeighbours <- function(SVposition){
   SVy <- SVposition["Ypos"]
   SVx <- SVposition["Xpos"]
   SVz <- SVposition["Zpos"]
-  
+
   #get the possible search spaces for each dimension
   #default cases (the own supervoxel)
   ZSS <- c(SVz)
@@ -151,7 +139,7 @@ getNeighbours <- function(SVposition){
    if(length(SVNeigh_vec)<27){
      SVNeigh_vec <- append(SVNeigh_vec,rep(NA,27-length(SVNeigh_vec)))
    }
-  
+
   SVNeigh_vec
 }
 neighbour_mat <- t(apply(svmatrix,1,getNeighbours))
@@ -187,24 +175,24 @@ persigarr = vector()
 for (impath in bspmfiles){
   # read image
   bspm = readTIFF(impath,all=T,as.is=T) #not-binarized MED
-  
+
   #Binarize the MEDs, as their pixel value is the MED index
   for(k in 1:length(bspm)){
     bspm[k][[1]] <- ifelse(bspm[k][[1]]>0,1,bspm[k][[1]])
   }
-  
+
   #Measure intensity in supervoxel
   measmat = matrix(0,nrow(svmatrix),1)
   #extract gene name:
   colnames(measmat) = tail(strsplit(impath,'/')[[1]],n=2)[1]
-  
+
   for(j in 1:length(measmat)){
     #y,x,z
     #restrict this search to the voxels occupied by the dapi
     ycent = svmatrix[j,1]
     xcent = svmatrix[j,2]
     zcent = svmatrix[j,3]
-    
+
     zstart = zcent-floor(npix/2)
     zstop = zcent+floor(npix/2)
     ystart = ycent-floor(npix/2)
@@ -214,14 +202,14 @@ for (impath in bspmfiles){
     if(zstop>zs){zstop=zs}
     if(ystop>ys){ystop=ys}
     if(xstop>xs){xstop=xs}
-    
+
     tosum = 0
     for(k in zstart:zstop){
       tosum = tosum + sum(bspm[k][[1]][ystart:ystop,xstart:xstop])
     }
     measmat[j,1] = tosum
   }
-  
+
   svmatrix = cbind(svmatrix,measmat)
 
   cat(paste(colnames(measmat)," Done\n"))
@@ -239,4 +227,3 @@ write.table(svmatrix[, 1:3],file=paste("./npix",npix,"/SuperVoxels_npix",npix,"_
 write.table(svmatrix[, 4:ncol(svmatrix)],file=paste("./npix",npix,"/SuperVoxels_npix",npix,"_GeneExpression.txt",sep=''),quote=F,sep=',',row.names=T)
 
 cat('Matrix saved, I am done\n')
-
