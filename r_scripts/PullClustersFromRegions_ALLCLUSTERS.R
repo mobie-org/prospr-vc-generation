@@ -11,10 +11,17 @@ library(ggplot2)
 library(png)
 library(rgl)
 
+args = commandArgs(trailingOnly=TRUE)
+# test if number of arguments are correct: if not, return an error
+if (length(args)<1) {
+  stop("Script called incorrectly.
+       Please provide:
+       Output folder of ProSPr_6dpf_SuperVoxelPixCount\n", call.=FALSE)
+}
 
-HelperFunctionsFile = './Clusters_Extraction_functions.R'
+HelperFunctionsFile = './r_scripts/Clusters_Extraction_functions.R'
 source(HelperFunctionsFile)
-MainDir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/npix3/'
+MainDir = args[1]
 setwd(MainDir)
 #########get the supervoxels coordinate file
 SVcoordinates=read.table('./SuperVoxels_npix3_SpatialInfo.txt',sep=",",header=T)

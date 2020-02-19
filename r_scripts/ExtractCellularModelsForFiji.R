@@ -9,7 +9,15 @@
 
 
 #working directory
-MainDir = '/Users/herny/Desktop/EMBL/ProSPr/PlatyBrowser/VirtualCells/GenerationOfVirtualCells/npix3/'
+args = commandArgs(trailingOnly=TRUE)
+# test if number of arguments are correct: if not, return an error
+if (length(args)<1) {
+  stop("Script called incorrectly.
+       Please provide:
+       Output folder of ProSPr_6dpf_SuperVoxelPixCount\n", call.=FALSE)
+}
+
+MainDir = args[1]
 
 setwd(MainDir) #***
 

@@ -7,7 +7,7 @@ print("Grouping the Supervoxels into cells in the cluster")
 # Rscript Clusters_Extraction_6dpf_npix3.R RegPro...SupervoxelsExpression_NoCorrRemoved
 
 # helper functions is assumed to be in the scripts folder
-HelperFunctionsFile = './Clusters_Extraction_functions.R'
+HelperFunctionsFile = './r_scripts/Clusters_Extraction_functions.R'
 #load functions
 source(HelperFunctionsFile)
 # get inputs
