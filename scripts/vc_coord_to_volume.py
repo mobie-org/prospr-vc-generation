@@ -4,10 +4,10 @@ import csv
 import os
 import subprocess
 import argparse
+import imageio
 import numpy as np
 from vigra.analysis import extractRegionFeatures, labelVolumeWithBackground
 from vigra.filters import distanceTransform
-from vigra.impex import writeVolume
 
 
 def map_coordinates_to_volume(coord_file):
@@ -176,9 +176,9 @@ def save_coord_file(data, old_file, new_file, label_dict=None):
 
 def save_tif(data, out_path, resolution):
     # the courtesy of Constantin
-    # write initial tif with vigra
+    # write initial tif
     out_path = out_path + '.tif'
-    writeVolume(data.T.astype('float'), out_path, '', dtype='FLOAT')
+    imageio.volwrite(out_path, data.astype('float32'))
     # encode the arguments for the imagej macro:
     # imagej macros can only take a single string as argument, so we need
     # to comma seperate the individual arguments
@@ -191,9 +191,6 @@ def save_tif(data, out_path, resolution):
     cmd = [fiji_executable, '-batch', '--headless', script, arguments]
     subprocess.run(cmd)
 
-
-#coord_file = '/g/kreshuk/zinchenk/cell_match/data/genes/CellModels_ALL_coordinates.tsv'
-#out_tif = '/g/kreshuk/zinchenk/cell_match/data/genes/vc_volume_prospr_space_all_vc15_ms8_nt4'
 
 if __name__ == '__main__':
 
