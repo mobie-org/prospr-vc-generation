@@ -19,7 +19,7 @@ if (length(args)<1) {
        Output folder of ProSPr_6dpf_SuperVoxelPixCount\n", call.=FALSE)
 }
 
-HelperFunctionsFile = './r_scripts/Clusters_Extraction_functions.R'
+HelperFunctionsFile = './scripts/Clusters_Extraction_functions.R'
 source(HelperFunctionsFile)
 MainDir = args[1]
 setwd(MainDir)
