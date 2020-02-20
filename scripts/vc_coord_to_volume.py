@@ -178,7 +178,7 @@ def save_tif(data, out_path, resolution):
     # the courtesy of Constantin
     # write initial tif with vigra
     out_path = out_path + '.tif'
-    writeVolume(data.T.astype('float32'), out_path, '', dtype='float32')
+    writeVolume(data.T.astype('float'), out_path, '', dtype='FLOAT')
     # encode the arguments for the imagej macro:
     # imagej macros can only take a single string as argument, so we need
     # to comma seperate the individual arguments
