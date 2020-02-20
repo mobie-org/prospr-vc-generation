@@ -133,157 +133,159 @@ save(finalclusters, file = paste(regionname,'_VirtualCells_Raw',sep=''))
 print("data saved")
 
 #######
+# EVERYTHING THAT FOLLOWS WILL BE COMMENTED OUT FOR NOW
+# CAN BE UNCOMMENTED IF WE NEED PICS
+#######
+#print("Cleaning the data and processing it for curation\n")
 
-print("Cleaning the data and processing it for curation\n")
-
-#create a dataframe with the final clusters:
-##Cluster identifier: ABBAB...
-##Supervoxels IDs: 1256,1252,...
-##Inner-cluster correlation value: 0.86
-##Spatial coherence / bilaterality: 11
-##Cluster size: 14
-clustersDF <- data.frame(
-  clusterID <- names(finalclusters),
-  supervoxelsID <- as.character(lapply(finalclusters,function(x){paste(x,collapse=",")})),
-  correlation <- as.numeric(lapply(finalclusters,function(x){MyCorrFunc(x,initMat)})),
-  spatialCoherence <- as.numeric(lapply(finalclusters,function(x){SpatCoheFunc(x,initCoord)})),
-  clusterSize <- as.numeric(lapply(finalclusters,length))
-)
-names(clustersDF) <- c("clustersID","supervoxelsID","correlation","spatialCoherence","clusterSize")
-
-#########
-sizelimit <- 15
-#plot nicely
-p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
-  geom_point(size = 3, alpha = 0.8) +
-  #scale_colour_gradientn(colours = topo.colors(5)) +
-  scale_color_gradient(low = 'red', high = 'green') +
-  ggtitle(paste(regionname," clusters characteristics",sep="")) +
-  theme(axis.title=element_text(size=14)) +
-  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
-  theme(axis.title=element_text(size=14)) +
-  theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
-        legend.key.size = unit(1, "cm"),
-        legend.text = element_text(size = 14, colour = "black", angle = 0),
-        legend.title = element_text(size = 14),
-        legend.box = "horizontal") +
-  theme(legend.key = element_blank()) +
-  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
-print(p)
-ggsave(paste(regionname,"_Clusters_characteristics.pdf",sep=""), width=10, height=10, dpi=700, useDingbats=FALSE)
-
-p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = clusterSize, y = spatialCoherence, color=correlation)) +
-  geom_point(size = 3, alpha = 0.5) +
-  #scale_colour_gradientn(colours = topo.colors(5)) +
-  scale_color_gradient(low = 'red', high = 'green') +
-  ggtitle(paste(regionname," clusters characteristics",sep="")) +
-  theme(axis.title=element_text(size=14)) +
-  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
-  theme(axis.title=element_text(size=14)) +
-  theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
-        legend.key.size = unit(1, "cm"),
-        legend.text = element_text(size = 14, colour = "black", angle = 0),
-        legend.title = element_text(size = 14),
-        legend.box = "horizontal") +
-  theme(legend.key = element_blank()) +
-  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
-print(p)
-ggsave(paste(regionname,"_Clusters_characteristics_SizeVSspatial.pdf",sep=""), width=10, height=10, dpi=700, useDingbats=FALSE)
-
-
-##Inspect All Cells Manually######
-cat("\n\nSaving images\n\n")
-#Create 3D visualizations for every cell, and show where in the plot are they.
-dir.create("Cell_Inspection")
-#load('ClustersHQ')
-setwd("Cell_Inspection")
-#########
-#clusters above size limit
-clustersAS <- clustersDF[clustersDF$clusterSize>sizelimit,]
-for(i in c(1:nrow(clustersAS))){
-
-  #see it in 3D
-  selected_cluster = clustersAS[i,"clustersID"]
-
-  cat(paste("Processing cluster",selected_cluster,"\n",sep = ' '))
-
-  #plot voxels
-  cols=rep("grey92",nrow(initCoord))
-  names(cols) = rownames(initCoord)
-  cols[strsplit(as.character(clustersAS[clustersAS$clustersID==selected_cluster,"supervoxelsID"]),',')[[1]]]='red'
-  plot3d(initCoord$Xpos,initCoord$Ypos,initCoord$Zpos,size=6,col='grey92',alpha=0.05)#,box=NA)
-  spheres3d(initCoord$Xpos[cols!='grey92'],initCoord$Ypos[cols!='grey92'],initCoord$Zpos[cols!='grey92'],radius=2,col=cols[cols!='grey92'],alpha=0.5)
-  aspect3d("iso")
-  par3d("windowRect"= c(0,0,800,800))
-  bg3d("black")
-  rgl.pop(type = "bboxdeco") #remove the box
-  rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 1)
-  rgl.snapshot(filename="SVviewTemp.png")
-
-
-  #Make the plot (run same parameters as above)
-  p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
-    #p <- ggplot(clustersAS, aes(x = correlation*(clusterSize^size_correction), y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
-    #p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
-    geom_point(size = 3, alpha = 0.8) +
-    #scale_colour_gradientn(colours = topo.colors(5)) +
-    scale_color_gradient(low = 'red', high = 'green') +
-    ggtitle(clustersAS[i,"clustersID"]) +
-    theme(axis.title=element_text(size=14)) +
-    theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
-    theme(axis.title=element_text(size=14)) +
-    theme(legend.position="none") +
-    #   theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
-    #         legend.key.size = unit(1, "cm"),
-    #         legend.text = element_text(size = 14, colour = "black", angle = 0),
-    #         legend.title = element_text(size = 14),
-    #         legend.box = "horizontal") +
-    #   theme(legend.key = element_blank()) +
-    #   theme(legend.background = element_rect(fill=alpha('grey', 0.0))) +
-    #  geom_abline(intercept = eq_int, slope = eq_sl) + #completely arbitrary shit
-    #  geom_point(aes(x = clustersAS[i,"correlation"]*(clustersAS[i,"clusterSize"]^size_correction), y = clustersAS[i,"spatialCoherence"]/(clustersAS[i,"clusterSize"]^size_correction)),shape = 21, colour = "black", size = 4, stroke = 2)
-    geom_point(aes(x = clustersAS[i,"correlation"], y = clustersAS[i,"spatialCoherence"]),shape = 21, colour = "black", size = 4, stroke = 2)
-  #print(p)
-  ggsave("DotViewTemp.png",width=5, height = 5, dpi=150)
-
-  # create a subplot and save the two images
-  SVview = readPNG(source = "SVviewTemp.png")
-  DotView = readPNG(source = "DotViewTemp.png")
-  # setup plot
-  #plot.new()
-  dev.new()
-  par(mar=rep(0,4)) # no margins
-  # layout the plots into a matrix w/ 2 columns, by row
-  layout(matrix(1:2, ncol=2, byrow=TRUE))
-  # do the plotting
-  plot(NA,xlim=0:1,ylim=0:1,xaxt="n",yaxt="n",bty="n")
-  rasterImage(SVview,0,0,1,1)
-  plot(NA,xlim=0:1,ylim=0:1,xaxt="n",yaxt="n",bty="n")
-  rasterImage(DotView,0,0,1,1)
-
-  # write to PDF
-  dev.print(png, paste(regionname,"_Clusters_",clustersAS[i,"clustersID"],".png",sep=""), width=2000,height=1000)
-  dev.off()
-
-  # delete temporary images
-  file.remove("SVviewTemp.png")
-  file.remove("DotViewTemp.png")
-
-
-}
-
-
-
-cat('Images saved\n')
+##create a dataframe with the final clusters:
+###Cluster identifier: ABBAB...
+###Supervoxels IDs: 1256,1252,...
+###Inner-cluster correlation value: 0.86
+###Spatial coherence / bilaterality: 11
+###Cluster size: 14
+#clustersDF <- data.frame(
+#  clusterID <- names(finalclusters),
+#  supervoxelsID <- as.character(lapply(finalclusters,function(x){paste(x,collapse=",")})),
+#  correlation <- as.numeric(lapply(finalclusters,function(x){MyCorrFunc(x,initMat)})),
+#  spatialCoherence <- as.numeric(lapply(finalclusters,function(x){SpatCoheFunc(x,initCoord)})),
+#  clusterSize <- as.numeric(lapply(finalclusters,length))
+#)
+#names(clustersDF) <- c("clustersID","supervoxelsID","correlation","spatialCoherence","clusterSize")
 
 ##########
-#Create a dicctionary to Sort the cells by their spatial coherence value
-txtout <- list()
-for(i in c(1:nrow(clustersAS))){
-  txtout[[i]] <- (paste(clustersAS[i,"clustersID"],sprintf("%05.1f",clustersAS[i,"spatialCoherence"]), sep=","))
-}
+#sizelimit <- 15
+##plot nicely
+#p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
+#  geom_point(size = 3, alpha = 0.8) +
+#  #scale_colour_gradientn(colours = topo.colors(5)) +
+#  scale_color_gradient(low = 'red', high = 'green') +
+#  ggtitle(paste(regionname," clusters characteristics",sep="")) +
+#  theme(axis.title=element_text(size=14)) +
+#  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
+#  theme(axis.title=element_text(size=14)) +
+#  theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
+#        legend.key.size = unit(1, "cm"),
+#        legend.text = element_text(size = 14, colour = "black", angle = 0),
+#        legend.title = element_text(size = 14),
+#        legend.box = "horizontal") +
+#  theme(legend.key = element_blank()) +
+#  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
+#print(p)
+#ggsave(paste(regionname,"_Clusters_characteristics.pdf",sep=""), width=10, height=10, dpi=700, useDingbats=FALSE)
 
-lapply(txtout, write, "000SortedCells.txt", append=TRUE, ncolumns=2000)
+#p <- ggplot(clustersDF[clustersDF$clusterSize>sizelimit,], aes(x = clusterSize, y = spatialCoherence, color=correlation)) +
+#  geom_point(size = 3, alpha = 0.5) +
+#  #scale_colour_gradientn(colours = topo.colors(5)) +
+#  scale_color_gradient(low = 'red', high = 'green') +
+#  ggtitle(paste(regionname," clusters characteristics",sep="")) +
+#  theme(axis.title=element_text(size=14)) +
+#  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
+#  theme(axis.title=element_text(size=14)) +
+#  theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
+#        legend.key.size = unit(1, "cm"),
+#        legend.text = element_text(size = 14, colour = "black", angle = 0),
+#        legend.title = element_text(size = 14),
+#        legend.box = "horizontal") +
+#  theme(legend.key = element_blank()) +
+#  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
+#print(p)
+#ggsave(paste(regionname,"_Clusters_characteristics_SizeVSspatial.pdf",sep=""), width=10, height=10, dpi=700, useDingbats=FALSE)
 
-#######
-cat("Clusters Extraction Done\n")
+
+###Inspect All Cells Manually######
+#cat("\n\nSaving images\n\n")
+##Create 3D visualizations for every cell, and show where in the plot are they.
+#dir.create("Cell_Inspection")
+##load('ClustersHQ')
+#setwd("Cell_Inspection")
+##########
+##clusters above size limit
+#clustersAS <- clustersDF[clustersDF$clusterSize>sizelimit,]
+#for(i in c(1:nrow(clustersAS))){
+
+#  #see it in 3D
+#  selected_cluster = clustersAS[i,"clustersID"]
+
+#  cat(paste("Processing cluster",selected_cluster,"\n",sep = ' '))
+
+#  #plot voxels
+#  cols=rep("grey92",nrow(initCoord))
+#  names(cols) = rownames(initCoord)
+#  cols[strsplit(as.character(clustersAS[clustersAS$clustersID==selected_cluster,"supervoxelsID"]),',')[[1]]]='red'
+#  plot3d(initCoord$Xpos,initCoord$Ypos,initCoord$Zpos,size=6,col='grey92',alpha=0.05)#,box=NA)
+#  spheres3d(initCoord$Xpos[cols!='grey92'],initCoord$Ypos[cols!='grey92'],initCoord$Zpos[cols!='grey92'],radius=2,col=cols[cols!='grey92'],alpha=0.5)
+#  aspect3d("iso")
+#  par3d("windowRect"= c(0,0,800,800))
+#  bg3d("black")
+#  rgl.pop(type = "bboxdeco") #remove the box
+#  rgl.viewpoint( theta = 0, phi = 0, fov = 60, zoom = 1)
+#  rgl.snapshot(filename="SVviewTemp.png")
+
+
+#  #Make the plot (run same parameters as above)
+#  p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence, color=clusterSize)) +
+#    #p <- ggplot(clustersAS, aes(x = correlation*(clusterSize^size_correction), y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
+#    #p <- ggplot(clustersAS, aes(x = correlation, y = spatialCoherence/(clusterSize^size_correction), color=clusterSize)) +
+#    geom_point(size = 3, alpha = 0.8) +
+#    #scale_colour_gradientn(colours = topo.colors(5)) +
+#    scale_color_gradient(low = 'red', high = 'green') +
+#    ggtitle(clustersAS[i,"clustersID"]) +
+#    theme(axis.title=element_text(size=14)) +
+#    theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
+#    theme(axis.title=element_text(size=14)) +
+#    theme(legend.position="none") +
+#    #   theme(legend.justification=c(0,0), legend.position=c(.85,0.65),
+#    #         legend.key.size = unit(1, "cm"),
+#    #         legend.text = element_text(size = 14, colour = "black", angle = 0),
+#    #         legend.title = element_text(size = 14),
+#    #         legend.box = "horizontal") +
+#    #   theme(legend.key = element_blank()) +
+#    #   theme(legend.background = element_rect(fill=alpha('grey', 0.0))) +
+#    #  geom_abline(intercept = eq_int, slope = eq_sl) + #completely arbitrary shit
+#    #  geom_point(aes(x = clustersAS[i,"correlation"]*(clustersAS[i,"clusterSize"]^size_correction), y = clustersAS[i,"spatialCoherence"]/(clustersAS[i,"clusterSize"]^size_correction)),shape = 21, colour = "black", size = 4, stroke = 2)
+#    geom_point(aes(x = clustersAS[i,"correlation"], y = clustersAS[i,"spatialCoherence"]),shape = 21, colour = "black", size = 4, stroke = 2)
+#  #print(p)
+#  ggsave("DotViewTemp.png",width=5, height = 5, dpi=150)
+
+#  # create a subplot and save the two images
+#  SVview = readPNG(source = "SVviewTemp.png")
+#  DotView = readPNG(source = "DotViewTemp.png")
+#  # setup plot
+#  #plot.new()
+#  dev.new()
+#  par(mar=rep(0,4)) # no margins
+#  # layout the plots into a matrix w/ 2 columns, by row
+#  layout(matrix(1:2, ncol=2, byrow=TRUE))
+#  # do the plotting
+#  plot(NA,xlim=0:1,ylim=0:1,xaxt="n",yaxt="n",bty="n")
+#  rasterImage(SVview,0,0,1,1)
+#  plot(NA,xlim=0:1,ylim=0:1,xaxt="n",yaxt="n",bty="n")
+#  rasterImage(DotView,0,0,1,1)
+
+#  # write to PDF
+#  dev.print(png, paste(regionname,"_Clusters_",clustersAS[i,"clustersID"],".png",sep=""), width=2000,height=1000)
+#  dev.off()
+
+#  # delete temporary images
+#  file.remove("SVviewTemp.png")
+#  file.remove("DotViewTemp.png")
+
+
+#}
+
+
+
+#cat('Images saved\n')
+
+###########
+##Create a dicctionary to Sort the cells by their spatial coherence value
+#txtout <- list()
+#for(i in c(1:nrow(clustersAS))){
+#  txtout[[i]] <- (paste(clustersAS[i,"clustersID"],sprintf("%05.1f",clustersAS[i,"spatialCoherence"]), sep=","))
+#}
+
+#lapply(txtout, write, "000SortedCells.txt", append=TRUE, ncolumns=2000)
+
+########
+#cat("Clusters Extraction Done\n")
