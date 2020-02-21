@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# For now I assume it's run on cluster
-# We need this specific version of R, might not work with later ones
-module load R/3.4.0-foss-2016b
-
 # If pathes to MEDs and body parts segmentation folder are not provided
 # take the default ones
 
@@ -61,4 +57,9 @@ Rscript ./scripts/GetExpressionForVirtualCellsCurated.R $npix_folder
 # add an empty cell in the first row, otherwise the gene names are shifted by one column left
 sed -i -e 1's/.*/\t&/' "${npix_folder}CellModels_ALL_profile_clust_curated.tsv"
 
-#TODO: update the names here
+# if the name dict file isn't present, download it
+if [ ! -f "helper_files/new_name_lut.json" ]; then
+    wget -P helper_files/ https://github.com/platybrowser/platybrowser-backend/raw/master/misc/new_name_lut.json
+fi
+
+python ./scripts/update_table_gene_names.py "${npix_folder}CellModels_ALL_profile_clust_curated.tsv" helper_files/new_name_lut.json

@@ -4,7 +4,9 @@
 
 - Curated ProSPr output (a.k.a. MEDs)
 - Manual segmentation of the animal into regions
-- Environment as described in environment.txt (TODO)
+- Environment installed with conda as follows:
+
+`conda create -n prospr_vc python=3.7 imageio vigra fiji r=3.4 -c conda-forge -c bioconda -c r`
 
 ## Usage:
 
