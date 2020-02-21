@@ -1,8 +1,7 @@
-#! /g/kreshuk/zinchenk/miniconda3/envs/platyneris/bin/python
-
 import csv
 import os
 import subprocess
+import shutil
 import argparse
 import imageio
 import numpy as np
@@ -186,8 +185,9 @@ def save_tif(data, out_path, resolution):
     arguments = "%s,%i,%f,%f,%f" % (out_path, data.shape[0],
                                     resolution[0], resolution[1], resolution[2])
     # call the imagej macro
-    fiji_executable = "/g/kreshuk/zinchenk/Fiji.app/ImageJ-linux64"
-    script = "/g/kreshuk/zinchenk/cell_match/scripts/other/set_voxel_size.ijm"
+    fiji_executable = shutil.which('ImageJ')
+    assert fiji_executable, 'ImageJ not found, the tif volume will not be saved'
+    script = os.path.join(os.path.dirname(__file__), "set_voxel_size.ijm")
     cmd = [fiji_executable, '-batch', '--headless', script, arguments]
     subprocess.run(cmd)
 

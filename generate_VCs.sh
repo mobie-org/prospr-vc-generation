@@ -53,7 +53,12 @@ Rscript ./scripts/CombineVirtualCells_ALLCLUSTERS.R $npix_folder
 
 Rscript ./scripts/ExtractCellularModelsForFiji.R $npix_folder
 
-# TODO: environment for it
-./scripts/vc_coord_to_volume.py "${npix_folder}CellModels_ALL_coordinates.tsv" "${npix_folder}volume_prospr_space_clust"
+#ImageJ might crash here, but will probably do the job properly anyway
+python ./scripts/vc_coord_to_volume.py "${npix_folder}CellModels_ALL_coordinates.tsv" "${npix_folder}volume_prospr_space_clust"
 
 Rscript ./scripts/GetExpressionForVirtualCellsCurated.R $npix_folder
+
+# add an empty cell in the first row, otherwise the gene names are shifted by one column left
+sed -i -e 1's/.*/\t&/' "${npix_folder}CellModels_ALL_profile_clust_curated.tsv"
+
+#TODO: update the names here
