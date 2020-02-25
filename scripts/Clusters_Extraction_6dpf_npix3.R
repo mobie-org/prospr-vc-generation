@@ -20,9 +20,9 @@ if (length(args)<1) {
 }
 ExpFile = args[1]
 
-library(ggplot2)
-library(png)
-library(rgl)
+#library(ggplot2)
+#library(png)
+#library(rgl)
 
 ############################################
 #########Define your directory

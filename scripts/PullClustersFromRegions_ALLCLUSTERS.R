@@ -4,12 +4,6 @@
 # Get the raw Virtual Cells from each region (created with 'Clusters_Extraction_6dpf_npix3.R')
 # to filter them by size and save plots of each of them for manual curation.
 
-# This has to be implemented because I did not solve the rgl xfvb issue in the slurm cluster
-
-
-library(ggplot2)
-library(png)
-library(rgl)
 
 args = commandArgs(trailingOnly=TRUE)
 # test if number of arguments are correct: if not, return an error
