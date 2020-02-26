@@ -17,14 +17,13 @@ else
         SEGM_DIR=$3
 fi
 
-
+source activate prospr_vc_r
 # Number of pixels (supervoxel length) will be hardcoded to 3
 # since further processing heavily relies on this
 Rscript ./scripts/ProSPr_6dpf_SuperVoxelPixCount.R $MED_DIR $SEGM_DIR 3 $1
 
 # The previous script outputs everything into a npix3 folder
 npix_folder="${1}/npix3/"
-
 # The list of regions from TrackEM, let it be hardcoded
 declare -a ListOfRegions=("CrypticSegment" "Head Lmo4" "Head -Lmo4" "PNS"
                           "Pygidium" "RestOfAnimal" "Stomodeum" "VNC" "All MHCL4")
@@ -49,11 +48,18 @@ Rscript ./scripts/CombineVirtualCells_ALLCLUSTERS.R $npix_folder
 
 Rscript ./scripts/ExtractCellularModelsForFiji.R $npix_folder
 
+conda deactivate
+conda activate prospr_vc_python
+
 #ImageJ might crash here, but will probably do the job properly anyway
 python ./scripts/vc_coord_to_volume.py "${npix_folder}CellModels_ALL_coordinates.tsv" "${npix_folder}volume_prospr_space_clust"
 
+conda deactivate
+conda activate prospr_vc_r
 Rscript ./scripts/GetExpressionForVirtualCellsCurated.R $npix_folder
 
+conda deactivate
+conda activate prospr_vc_python
 # add an empty cell in the first row, otherwise the gene names are shifted by one column left
 sed -i -e 1's/.*/\t&/' "${npix_folder}CellModels_ALL_profile_clust_curated.tsv"
 

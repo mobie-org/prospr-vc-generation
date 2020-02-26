@@ -187,38 +187,38 @@ save(Regionvoxels_reduced,file = paste(OutputDirName,"_SupervoxelsExpression_NoC
 cat('\nData saved, plotting and wrapping up\n')
 ###############plot
 
-library(ggplot2)
+#library(ggplot2)
 
-p1 <- ggplot(CorrResDf, aes(x=MeansVec, y=SdsVec))
-p1 +
-  geom_point(alpha = 0.1,size = 2, aes(colour = Label)) +
-  #geom_point(alpha = 0.1,size = 2) +
-  scale_color_manual(values = c("black","blue")) +
-  #geom_path(data=ell, aes(x=x, y=y), size=1, linetype=1, color="red") +
-  stat_density_2d(aes(fill = ..level.., alpha = ..level..),size = 0.2, geom = 'polygon') +
-  scale_fill_gradient(low = "green", high = "red") +
-  scale_alpha(range = c(0.2, 0.5), guide = FALSE) +
-  #stat_density2d(geom="tile", aes(fill = ..density..), contour = FALSE) +
-  #geom_smooth() +
-  #scale_colour_gradientn(colours = topo.colors(10)) +
-  coord_cartesian(xlim = c(0, 1)) +
-  #scale_y_log10() +
-  ggtitle("Neighbour Correlation Analysis") +
-  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
-  ylab("Neighbour correlation Standard Deviation") +
-  xlab("Neighbour correlation Mean") +
-  theme(axis.title=element_text(size=14)) +
-  theme(legend.justification=c(0,0), legend.position=c(.8,0.65),
-        #legend.key.size = unit(0.6, "cm"),
-        legend.text = element_text(size = 14, colour = "black", angle = 0),
-        legend.title = element_text(size = 14),
-        legend.box = "horizontal") +
-  theme(legend.key = element_blank()) +
-  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
+#p1 <- ggplot(CorrResDf, aes(x=MeansVec, y=SdsVec))
+#p1 +
+#  geom_point(alpha = 0.1,size = 2, aes(colour = Label)) +
+#  #geom_point(alpha = 0.1,size = 2) +
+#  scale_color_manual(values = c("black","blue")) +
+#  #geom_path(data=ell, aes(x=x, y=y), size=1, linetype=1, color="red") +
+#  stat_density_2d(aes(fill = ..level.., alpha = ..level..),size = 0.2, geom = 'polygon') +
+#  scale_fill_gradient(low = "green", high = "red") +
+#  scale_alpha(range = c(0.2, 0.5), guide = FALSE) +
+#  #stat_density2d(geom="tile", aes(fill = ..density..), contour = FALSE) +
+#  #geom_smooth() +
+#  #scale_colour_gradientn(colours = topo.colors(10)) +
+#  coord_cartesian(xlim = c(0, 1)) +
+#  #scale_y_log10() +
+#  ggtitle("Neighbour Correlation Analysis") +
+#  theme(plot.title = element_text(size=18,vjust=1.1, face="bold")) +
+#  ylab("Neighbour correlation Standard Deviation") +
+#  xlab("Neighbour correlation Mean") +
+#  theme(axis.title=element_text(size=14)) +
+#  theme(legend.justification=c(0,0), legend.position=c(.8,0.65),
+#        #legend.key.size = unit(0.6, "cm"),
+#        legend.text = element_text(size = 14, colour = "black", angle = 0),
+#        legend.title = element_text(size = 14),
+#        legend.box = "horizontal") +
+#  theme(legend.key = element_blank()) +
+#  theme(legend.background = element_rect(fill=alpha('grey', 0.0)))
 
-ggsave(paste(NameOfRegion,"_SV_NeighbourCorrelationSelected.pdf",sep=""), width=10, height=6, dpi=700, useDingbats=FALSE)
+#ggsave(paste(NameOfRegion,"_SV_NeighbourCorrelationSelected.pdf",sep=""), width=10, height=6, dpi=700, useDingbats=FALSE)
 
 
-cat('Region_Profiler.R Done\n')
+#cat('Region_Profiler.R Done\n')
 
 #******From this point you can use the cluster to get the cells of the region*******

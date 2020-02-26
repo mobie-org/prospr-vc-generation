@@ -6,8 +6,9 @@
 - Manual segmentation of the animal into regions
 - Two separate environments installed with conda as follows:
 
-`conda create -n prospr_vc_r r=3.4 r-tiff r-vegan -c r -c conda-forge
-conda create -n prospr_vc_python python=3.7 imageio vigra fiji -c conda-forge -c bioconda`
+`conda create -n prospr_vc_r r=3.4 r-tiff r-vegan -c r -c conda-forge`
+
+`conda create -n prospr_vc_python python=3.7 imageio vigra fiji -c conda-forge -c bioconda`
 
 ## Usage:
 
