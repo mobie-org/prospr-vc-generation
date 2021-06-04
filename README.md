@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/240307002.svg)](https://zenodo.org/badge/latestdoi/240307002)
+
 # Generate Virtual Cells from ProSPr
 
 ## Requirements:
